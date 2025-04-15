@@ -193,3 +193,27 @@ input:focus {
         grid-template-columns: 1fr auto;
     }
 }
+
+/* Ajustes para el formulario de registro con requisitos de contraseña */
+.login-card {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+@media (max-height: 800px) {
+    .login-card {
+        padding: 20px;
+    }
+    
+    .logo {
+        max-width: 120px;
+    }
+    
+    h1 {
+        margin-bottom: 15px;
+    }
+}
