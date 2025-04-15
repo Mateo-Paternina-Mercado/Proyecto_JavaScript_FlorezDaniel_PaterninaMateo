@@ -1,0 +1,63 @@
+/* Estilos específicos para el Dashboard */
+.characters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.character-card {
+    background-color: var(--card-background);
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 10px;
+    transition: transform 0.3s;
+}
+
+.character-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.character-card h3 {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 8px;
+}
+
+.create-character {
+    border: 2px dashed #ccc;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    min-height: 200px;
+}
+
+.create-character:hover {
+    border-color: var(--primary-color);
+}
+
+.create-character span {
+    font-size: 48px;
+    color: #ccc;
+}
+
+.create-character:hover span {
+    color: var(--primary-color);
+}
+
+/* Estilos responsivos para el dashboard */
+@media (max-width: 768px) {
+    .characters-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .characters-grid {
+        grid-template-columns: 1fr;
+    }
+}

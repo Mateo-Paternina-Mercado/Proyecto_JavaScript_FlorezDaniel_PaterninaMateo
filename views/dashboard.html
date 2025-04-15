@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="icon" href="../storage/img/Dragon_ball_logo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Dragon Ball Super D&D - Dashboard</title>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="logo-container">
+                <img src="../storage/img/Dragon_ball_logo.png" alt="Dragon Ball Super Logo" style="max-width: 150px;">
+            </div>
+            <h1 class="welcome-message">¡Bienvenido a Dragon Ball Super D&D!</h1>
+            <div>
+                <button id="logoutBtn" class="btn logout-btn">Cerrar Sesión</button>
+            </div>
+        </div>
+        
+        <div class="dashboard-card">
+            <h2>Tus Personajes</h2>
+            <p>Crea y gestiona tus personajes para la partida de Dungeons & Dragons con temática de Dragon Ball Super.</p>
+            
+            <div class="characters-grid">
+                <!-- Tarjeta para crear nuevo personaje -->
+                <div class="character-card create-character">
+                    <span>+</span>
+                    <p>Crear nuevo personaje</p>
+                </div>
+                
+                <!-- Personajes de ejemplo (se llenarán dinámicamente en el futuro) -->
+                <div class="character-card">
+                    <h3>Goku Paladín</h3>
+                    <p>Nivel: 5</p>
+                    <p>Raza: Saiyan</p>
+                    <button class="btn btn-primary">Ver detalles</button>
+                </div>
+                
+                <div class="character-card">
+                    <h3>Vegeta Guerrero</h3>
+                    <p>Nivel: 6</p>
+                    <p>Raza: Saiyan Elite</p>
+                    <button class="btn btn-primary">Ver detalles</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si hay un usuario logueado
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (!currentUser) {
+                // Redirigir al login si no hay usuario
+                window.location.href = '../index.html';
+            }
+            
+            // Manejar cierre de sesión
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('currentUser');
+                window.location.href = '../index.html';
+            });
+            
+            // Evento para crear nuevo personaje
+            document.querySelector('.create-character').addEventListener('click', function() {
+                alert('Funcionalidad de creación de personajes en desarrollo');
+                // Aquí iría la redirección a la página de creación de personajes
+                // window.location.href = 'create-character.html';
+            });
+        });
+    </script>
+</body>
+</html>

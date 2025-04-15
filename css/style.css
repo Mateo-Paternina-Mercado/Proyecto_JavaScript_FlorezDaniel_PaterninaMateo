@@ -20,9 +20,8 @@ body {
     background-color: var(--background-color);
     background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    place-items: center;
 }
 
 .login-container {
@@ -36,11 +35,13 @@ body {
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     padding: 30px;
-    text-align: center;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: 20px;
 }
 
 .logo-container {
-    margin-bottom: 20px;
+    justify-self: center;
 }
 
 .logo {
@@ -50,18 +51,23 @@ body {
 
 h1 {
     color: var(--text-color);
-    margin-bottom: 25px;
     font-size: 24px;
+    text-align: center;
+}
+
+form {
+    display: grid;
+    grid-template-rows: repeat(auto-fill, auto);
+    gap: 20px;
 }
 
 .form-group {
-    margin-bottom: 20px;
-    text-align: left;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 8px;
 }
 
 label {
-    display: block;
-    margin-bottom: 8px;
     color: var(--text-color);
     font-weight: 500;
 }
@@ -82,7 +88,9 @@ input:focus {
 }
 
 .form-actions {
-    margin-top: 30px;
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: 10px;
 }
 
 .btn {
@@ -93,6 +101,8 @@ input:focus {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s;
+    justify-self: center;
+    width: 100%;
 }
 
 .btn-primary {
@@ -106,8 +116,8 @@ input:focus {
 }
 
 .register-link {
-    margin-top: 20px;
     color: var(--text-color);
+    text-align: center;
 }
 
 .register-link a {
@@ -122,9 +132,47 @@ input:focus {
 
 .error-message {
     color: var(--error-color);
-    margin-top: 15px;
     font-size: 14px;
     min-height: 20px;
+    text-align: center;
+}
+
+/* Dashboard base styles */
+.dashboard-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 30px;
+}
+
+.dashboard-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 20px;
+}
+
+.welcome-message {
+    font-size: 24px;
+    color: var(--text-color);
+}
+
+.dashboard-card {
+    background-color: var(--card-background);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    display: grid;
+    grid-template-rows: auto auto auto;
+    gap: 15px;
+}
+
+.logout-btn {
+    background-color: var(--secondary-color);
+    color: white;
 }
 
 /* Responsive */
@@ -139,5 +187,9 @@ input:focus {
     
     .logo {
         max-width: 150px;
+    }
+    
+    .dashboard-header {
+        grid-template-columns: 1fr auto;
     }
 }
