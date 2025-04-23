@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../styles/style.css">
+<link rel="stylesheet" href="../styles/character-creator.css">
+<link rel="icon" href="../assets/Dragon_ball_logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<title>Dragon Ball Super D&D - Creación de Personaje</title>
+</head>
+<body>
+<div class="character-creator-container">
+    <header class="creator-header">
+        <div class="logo-container">
+            <img src="../assets/Dragon_ball_logo.png" alt="Dragon Ball Super Logo" class="logo">
+        </div>
+        <h1>Creación de Personaje</h1>
+        <div>
+            <button id="backToDashboard" class="btn secondary-btn">Volver al Dashboard</button>
+        </div>
+    </header>
+
+    <div class="creator-content">
+        <!-- Formulario de creación de personaje -->
+        <div class="character-form-container">
+            <form id="characterForm">
+                <div class="form-section">
+                    <h2>Información Básica</h2>
+                    <div class="form-group">
+                        <label for="characterName">Nombre del Personaje</label>
+                        <input type="text" id="characterName" name="characterName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="characterRace">Raza</label>
+                        <select id="characterRace" name="characterRace" required>
+                            <option value="" disabled selected>Selecciona una raza</option>
+                            <!-- Se llenará dinámicamente desde la API -->
+                            <option value="loading">Cargando razas...</option>
+                        </select>
+                        <div id="raceDescription" class="description-box"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="characterClass">Clase</label>
+                        <select id="characterClass" name="characterClass" required>
+                            <option value="" disabled selected>Selecciona una clase</option>
+                            <!-- Se llenará dinámicamente desde la API -->
+                            <option value="loading">Cargando clases...</option>
+                        </select>
+                        <div id="classDescription" class="description-box"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Género</label>
+                        <div class="radio-group">
+                            <input type="radio" id="genderMale" name="gender" value="Masculino" checked>
+                            <label for="genderMale">Masculino</label>
+                            
+                            <input type="radio" id="genderFemale" name="gender" value="Femenino">
+                            <label for="genderFemale">Femenino</label>
+                            
+                            <input type="radio" id="genderOther" name="gender" value="Otro">
+                            <label for="genderOther">Otro</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h2>Estadísticas</h2>
+                    <div class="stats-container">
+                        <div class="stats-controls">
+                            <button type="button" id="rollDiceBtn" class="btn primary-btn">
+                                <span class="dice-icon">🎲</span> Lanzar Dados
+                            </button>
+                            <p class="dice-info">Lanza los dados para determinar tus estadísticas base</p>
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <label for="statStrength">Fuerza</label>
+                                <input type="number" id="statStrength" name="statStrength" min="1" max="20" value="10" readonly>
+                                <div class="stat-bar">
+                                    <div class="stat-fill" id="statStrengthFill" style="width: 50%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <label for="statKi">Ki</label>
+                                <input type="number" id="statKi" name="statKi" min="1" max="20" value="10" readonly>
+                                <div class="stat-bar">
+                                    <div class="stat-fill" id="statKiFill" style="width: 50%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <label for="statCombatMastery">Maestría en Combate</label>
+                                <input type="number" id="statCombatMastery" name="statCombatMastery" min="1" max="20" value="10" readonly>
+                                <div class="stat-bar">
+                                    <div class="stat-fill" id="statCombatMasteryFill" style="width: 50%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <label for="statIntelligence">Inteligencia</label>
+                                <input type="number" id="statIntelligence" name="statIntelligence" min="1" max="20" value="10" readonly>
+                                <div class="stat-bar">
+                                    <div class="stat-fill" id="statIntelligenceFill" style="width: 50%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <label for="statCombatIntelligence">Inteligencia en Combate</label>
+                                <input type="number" id="statCombatIntelligence" name="statCombatIntelligence" min="1" max="20" value="10" readonly>
+                                <div class="stat-bar">
+                                    <div class="stat-fill" id="statCombatIntelligenceFill" style="width: 50%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <label for="statConstitution">Complexión</label>
+                                <input type="number" id="statConstitution" name="statConstitution" min="1" max="20" value="10" readonly>
+                                <div class="stat-bar">
+                                    <div class="stat-fill" id="statConstitutionFill" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h2>Equipamiento</h2>
+                    <div class="form-group">
+                        <label for="characterWeapon">Arma</label>
+                        <select id="characterWeapon" name="characterWeapon">
+                            <option value="" disabled selected>Selecciona un arma</option>
+                            <!-- Se llenará dinámicamente -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="characterArmor">Armadura</label>
+                        <select id="characterArmor" name="characterArmor">
+                            <option value="" disabled selected>Selecciona una armadura</option>
+                            <!-- Se llenará dinámicamente -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="characterAccessory">Accesorio</label>
+                        <select id="characterAccessory" name="characterAccessory">
+                            <option value="" disabled selected>Selecciona un accesorio</option>
+                            <!-- Se llenará dinámicamente -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h2>Habilidades Especiales</h2>
+                    <div id="specialAbilitiesContainer" class="abilities-container">
+                        <!-- Se llenará dinámicamente basado en la raza y clase seleccionadas -->
+                        <p class="placeholder-text">Selecciona una raza y clase para ver las habilidades disponibles</p>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" id="saveLocalBtn" class="btn secondary-btn">Guardar Localmente</button>
+                    <button type="submit" id="saveCharacterBtn" class="btn primary-btn">Guardar Personaje</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Vista previa del personaje -->
+        <div class="character-preview-container">
+            <div class="character-preview-card">
+                <h2>Vista Previa</h2>
+                <div class="character-image-container">
+                    <img id="characterImage" src="../assets/character-placeholder.png" alt="Vista previa del personaje">
+                </div>
+                <div class="character-summary">
+                    <h3 id="previewName">Nombre del Personaje</h3>
+                    <div class="character-details">
+                        <p><strong>Raza:</strong> <span id="previewRace">-</span></p>
+                        <p><strong>Clase:</strong> <span id="previewClass">-</span></p>
+                        <p><strong>Género:</strong> <span id="previewGender">Masculino</span></p>
+                    </div>
+                    <div class="character-stats-preview">
+                        <h4>Estadísticas</h4>
+                        <ul>
+                            <li>Fuerza: <span id="previewStrength">10</span></li>
+                            <li>Ki: <span id="previewKi">10</span></li>
+                            <li>Maestría en Combate: <span id="previewCombatMastery">10</span></li>
+                            <li>Inteligencia: <span id="previewIntelligence">10</span></li>
+                            <li>Inteligencia en Combate: <span id="previewCombatIntelligence">10</span></li>
+                            <li>Complexión: <span id="previewConstitution">10</span></li>
+                        </ul>
+                    </div>
+                    <div class="character-equipment-preview">
+                        <h4>Equipamiento</h4>
+                        <ul>
+                            <li>Arma: <span id="previewWeapon">-</span></li>
+                            <li>Armadura: <span id="previewArmor">-</span></li>
+                            <li>Accesorio: <span id="previewAccessory">-</span></li>
+                        </ul>
+                    </div>
+                    <div class="character-abilities-preview">
+                        <h4>Habilidades Especiales</h4>
+                        <ul id="previewAbilities">
+                            <li class="placeholder-text">Ninguna habilidad seleccionada</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dice-container" id="diceContainer">
+                <div class="dice" id="dice">
+                    <div class="dice-face">1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div class="modal" id="saveModal">
+    <div class="modal-content">
+        <h2>¡Personaje Guardado!</h2>
+        <p>Tu personaje ha sido guardado correctamente.</p>
+        <div class="modal-actions">
+            <button id="viewCharactersBtn" class="btn secondary-btn">Ver Mis Personajes</button>
+            <button id="createAnotherBtn" class="btn primary-btn">Crear Otro Personaje</button>
+        </div>
+    </div>
+</div>
+
+<script src="./js/character-creator.js"></script>
+</body>
+</html>

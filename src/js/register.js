@@ -1,184 +1,122 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const registerForm = document.getElementById('registerForm');
-    const errorMessage = document.getElementById('error-message');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-    const passwordStrength = document.getElementById('password-strength');
-    const passwordRequirements = document.getElementById('password-requirements');
-    
-    // URL de la API de MockAPI
-    const apiUrl = 'https://67fe6eb758f18d7209ee325e.mockapi.io/userProfiles';
-    
+document.addEventListener("DOMContentLoaded", () => {
+    const registerForm = document.getElementById("registerForm")
+    const passwordInput = document.getElementById("password")
+    const confirmPasswordInput = document.getElementById("confirmPassword")
+    const passwordStrength = document.getElementById("password-strength")
+    const passwordRequirements = document.getElementById("password-requirements")
+    const errorMessage = document.getElementById("error-message")
+  
     // Requisitos de contraseña
-    const passwordRequirementsList = [
-        { regex: /.{8,}/, text: "Al menos 8 caracteres" },
-        { regex: /[A-Z]/, text: "Al menos una letra mayúscula" },
-        { regex: /[a-z]/, text: "Al menos una letra minúscula" },
-        { regex: /[0-9]/, text: "Al menos un número" },
-        { regex: /[^A-Za-z0-9]/, text: "Al menos un carácter especial" }
-    ];
-    
-    // Función para validar la contraseña
-    function validatePassword(password) {
-        let strength = 0;
-        let failedRequirements = [];
-        
-        // Verificar cada requisito
-        passwordRequirementsList.forEach(requirement => {
-            const isValid = requirement.regex.test(password);
-            if (isValid) {
-                strength++;
-            } else {
-                failedRequirements.push(requirement.text);
-            }
-        });
-        
-        return {
-            strength: strength,
-            failedRequirements: failedRequirements,
-            isValid: strength === passwordRequirementsList.length
-        };
-    }
-    
-    // Actualizar la visualización de la fortaleza de la contraseña
-    function updatePasswordStrength() {
-        const password = passwordInput.value;
-        const validation = validatePassword(password);
-        
-        // Actualizar la barra de fortaleza
-        passwordStrength.className = 'password-strength-bar';
-        
-        if (password === '') {
-            passwordStrength.style.width = '0%';
-            passwordStrength.dataset.strength = '';
+    const requirements = [
+      { regex: /.{8,}/, text: "Al menos 8 caracteres" },
+      { regex: /[0-9]/, text: "Al menos un número" },
+      { regex: /[a-z]/, text: "Al menos una letra minúscula" },
+      { regex: /[A-Z]/, text: "Al menos una letra mayúscula" },
+      { regex: /[^A-Za-z0-9]/, text: "Al menos un carácter especial" },
+    ]
+  
+    // Crear elementos para los requisitos
+    requirements.forEach((req) => {
+      const li = document.createElement("li")
+      li.textContent = req.text
+      passwordRequirements.appendChild(li)
+    })
+  
+    // Validar contraseña en tiempo real
+    passwordInput.addEventListener("input", () => {
+      const password = passwordInput.value
+      let strength = 0
+      let validRequirements = 0
+  
+      // Verificar cada requisito
+      requirements.forEach((req, index) => {
+        const li = passwordRequirements.children[index]
+        const isValid = req.regex.test(password)
+  
+        if (isValid) {
+          li.classList.add("valid")
+          validRequirements++
         } else {
-            const strengthPercentage = (validation.strength / passwordRequirementsList.length) * 100;
-            passwordStrength.style.width = strengthPercentage + '%';
-            
-            if (strengthPercentage <= 20) {
-                passwordStrength.dataset.strength = 'muy-debil';
-            } else if (strengthPercentage <= 40) {
-                passwordStrength.dataset.strength = 'debil';
-            } else if (strengthPercentage <= 60) {
-                passwordStrength.dataset.strength = 'media';
-            } else if (strengthPercentage <= 80) {
-                passwordStrength.dataset.strength = 'fuerte';
-            } else {
-                passwordStrength.dataset.strength = 'muy-fuerte';
-            }
+          li.classList.remove("valid")
         }
-        
-        // Actualizar los requisitos
-        passwordRequirements.innerHTML = '';
-        validation.failedRequirements.forEach(req => {
-            const li = document.createElement('li');
-            li.textContent = req;
-            li.className = 'requirement-failed';
-            passwordRequirements.appendChild(li);
-        });
-        
-        // Mostrar requisitos cumplidos también
-        passwordRequirementsList.forEach(req => {
-            if (!validation.failedRequirements.includes(req.text)) {
-                const li = document.createElement('li');
-                li.textContent = req.text + ' ✓';
-                li.className = 'requirement-passed';
-                passwordRequirements.appendChild(li);
-            }
-        });
-    }
-    
-    // Evento para actualizar la fortaleza de la contraseña en tiempo real
-    passwordInput.addEventListener('input', updatePasswordStrength);
-    
-    registerForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const email = document.getElementById('email').value;
-        const password = passwordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-        
-        // Validación básica
-        if (!email || !password || !confirmPassword) {
-            showError('Por favor, completa todos los campos');
-            return;
+      })
+  
+      // Calcular fuerza de la contraseña
+      if (validRequirements >= 5) {
+        strength = "strong"
+      } else if (validRequirements >= 3) {
+        strength = "medium"
+      } else if (validRequirements >= 1) {
+        strength = "weak"
+      } else {
+        strength = ""
+      }
+  
+      // Actualizar indicador visual
+      passwordStrength.setAttribute("data-strength", strength)
+    })
+  
+    // Validar formulario al enviar
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault()
+  
+      const email = document.getElementById("email").value
+      const password = passwordInput.value
+      const confirmPassword = confirmPasswordInput.value
+  
+      // Validar que las contraseñas coincidan
+      if (password !== confirmPassword) {
+        errorMessage.textContent = "Las contraseñas no coinciden"
+        return
+      }
+  
+      // Validar requisitos de contraseña
+      let validRequirements = 0
+      requirements.forEach((req) => {
+        if (req.regex.test(password)) {
+          validRequirements++
         }
-        
-        // Validar formato de email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            showError('Por favor, ingresa un email válido');
-            return;
+      })
+  
+      if (validRequirements < 5) {
+        errorMessage.textContent = "La contraseña no cumple con todos los requisitos"
+        return
+      }
+  
+      try {
+        // Verificar si el usuario ya existe
+        const checkResponse = await fetch("https://67fe6eb758f18d7209ee325e.mockapi.io/userProfiles")
+        const users = await checkResponse.json()
+  
+        const userExists = users.some((user) => user.email === email)
+  
+        if (userExists) {
+          errorMessage.textContent = "Este correo electrónico ya está registrado"
+          return
         }
-        
-        // Validar contraseña
-        const passwordValidation = validatePassword(password);
-        if (!passwordValidation.isValid) {
-            showError('La contraseña no cumple con los requisitos de seguridad');
-            return;
+  
+        // Crear nuevo usuario
+        const response = await fetch("https://67fe6eb758f18d7209ee325e.mockapi.io/userProfiles", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password, // En una aplicación real, esto debería estar encriptado
+          }),
+        })
+  
+        if (response.ok) {
+          // Redirigir al login
+          window.location.href = "index.html"
+        } else {
+          errorMessage.textContent = "Error al registrar el usuario. Inténtalo de nuevo."
         }
-        
-        if (password !== confirmPassword) {
-            showError('Las contraseñas no coinciden');
-            return;
-        }
-        
-        try {
-            // Verificar si el email ya está registrado
-            const checkResponse = await fetch(apiUrl);
-            
-            if (!checkResponse.ok) {
-                throw new Error('Error al conectar con el servidor');
-            }
-            
-            const users = await checkResponse.json();
-            
-            if (users.some(user => user.email === email)) {
-                showError('Este email ya está registrado');
-                return;
-            }
-            
-            // Crear nuevo usuario
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error('Error al registrar usuario');
-            }
-            
-            const newUser = await response.json();
-            
-            // Registro exitoso
-            alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
-            window.location.href = '../index.html';
-            
-        } catch (error) {
-            showError('Error: ' + error.message);
-            console.error('Error:', error);
-        }
-    });
-    
-    function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.style.opacity = '1';
-        
-        // Limpiar mensaje después de 3 segundos
-        setTimeout(() => {
-            errorMessage.style.opacity = '0';
-            setTimeout(() => {
-                errorMessage.textContent = '';
-            }, 300);
-        }, 3000);
-    }
-    
-    // Inicializar la visualización de requisitos
-    updatePasswordStrength();
-});
+      } catch (error) {
+        console.error("Error:", error)
+        errorMessage.textContent = "Error de conexión. Inténtalo de nuevo más tarde."
+      }
+    })
+  })
+  
