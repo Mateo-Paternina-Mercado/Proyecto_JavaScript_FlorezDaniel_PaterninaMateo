@@ -9,6 +9,7 @@
   --border-color: #3a5a7a;
   --success-color: #2a6a4a;
   --error-color: #6a2a2a;
+  --danger-color: #8a2a2a;
   --background-gradient: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
 }
 
@@ -129,7 +130,8 @@ body::before {
 
 .form-group input[type="text"],
 .form-group input[type="number"],
-.form-group select {
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 10px;
   border-radius: 5px;
@@ -137,6 +139,11 @@ body::before {
   background-color: rgba(20, 30, 40, 0.7);
   color: var(--text-color);
   font-family: "Roboto", sans-serif;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
 .form-group select {
@@ -218,6 +225,23 @@ body::before {
   gap: 10px;
 }
 
+.abilities-limit-message {
+  grid-column: 1 / -1;
+  background-color: rgba(30, 40, 50, 0.7);
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  border: 1px dashed var(--border-color);
+}
+
+.abilities-limit-message p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--highlight-color);
+  font-weight: bold;
+}
+
 .ability-item {
   background-color: rgba(20, 30, 40, 0.7);
   border: 1px solid var(--border-color);
@@ -234,6 +258,16 @@ body::before {
 .ability-item.selected {
   border-color: var(--highlight-color);
   background-color: rgba(40, 60, 80, 0.7);
+  position: relative;
+}
+
+.ability-item.selected::after {
+  content: "✓";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--highlight-color);
+  font-weight: bold;
 }
 
 .ability-item h4 {
@@ -415,6 +449,15 @@ body::before {
 
 .secondary-btn:hover {
   background-color: rgba(58, 90, 122, 0.2);
+}
+
+.danger-btn {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.danger-btn:hover {
+  background-color: #aa3a3a;
 }
 
 .form-actions {

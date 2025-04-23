@@ -1,8 +1,9 @@
 // Constantes y configuración
 const MOCKAPI_URL = "https://67fe6eb758f18d7209ee325e.mockapi.io/characters"
-const LOCAL_STORAGE_KEY = "dbs_character_draft"
+const LOCAL_STORAGE_KEY = "dbs_character_edit_draft"
 const MAX_TOTAL_STATS = 70 // Máximo total de puntos de estadísticas
 const MAX_ABILITIES = 2 // Máximo de habilidades seleccionables
+const characterId = localStorage.getItem("editCharacterId")
 
 // Elementos del DOM
 const characterForm = document.getElementById("characterForm")
@@ -15,17 +16,20 @@ const genderInputs = document.querySelectorAll('input[name="gender"]')
 const rollDiceBtn = document.getElementById("rollDiceBtn")
 const diceContainer = document.getElementById("diceContainer")
 const dice = document.getElementById("dice")
-const saveLocalBtn = document.getElementById("saveLocalBtn")
-const saveCharacterBtn = document.getElementById("saveCharacterBtn")
-const backToDashboardBtn = document.getElementById("backToDashboard")
-const specialAbilitiesContainer = document.getElementById("specialAbilitiesContainer")
 const characterWeaponSelect = document.getElementById("characterWeapon")
 const characterArmorSelect = document.getElementById("characterArmor")
 const characterAccessorySelect = document.getElementById("characterAccessory")
 const characterBackgroundTextarea = document.getElementById("characterBackground")
+const specialAbilitiesContainer = document.getElementById("specialAbilitiesContainer")
+const deleteCharacterBtn = document.getElementById("deleteCharacterBtn")
+const saveCharacterBtn = document.getElementById("saveCharacterBtn")
+const backToDetailsBtn = document.getElementById("backToDetails")
+const deleteModal = document.getElementById("deleteModal")
+const cancelDeleteBtn = document.getElementById("cancelDeleteBtn")
+const confirmDeleteBtn = document.getElementById("confirmDeleteBtn")
 const saveModal = document.getElementById("saveModal")
-const viewCharactersBtn = document.getElementById("viewCharactersBtn")
-const createAnotherBtn = document.getElementById("createAnotherBtn")
+const viewDetailsBtn = document.getElementById("viewDetailsBtn")
+const backToDashboardBtn = document.getElementById("backToDashboardBtn")
 
 // Elementos de la vista previa
 const previewName = document.getElementById("previewName")
@@ -52,16 +56,23 @@ let armors = []
 let accessories = []
 let specialAbilities = []
 let selectedAbilities = []
+let originalCharacter = null
 
 // Inicialización
 document.addEventListener("DOMContentLoaded", () => {
+  // Verificar si hay un ID de personaje para editar
+  if (!characterId) {
+    window.location.href = "dashboard.html"
+    return
+  }
+
   // Cargar datos desde APIs
   fetchRaces()
   fetchClasses()
   fetchEquipment()
 
-  // Cargar datos guardados en localStorage
-  loadFromLocalStorage()
+  // Cargar los datos del personaje
+  loadCharacterDetails()
 
   // Configurar eventos
   setupEventListeners()
@@ -368,19 +379,30 @@ function setupEventListeners() {
   // Eventos para los dados
   rollDiceBtn.addEventListener("click", rollDice)
 
-  // Eventos para guardar
-  saveLocalBtn.addEventListener("click", saveToLocalStorage)
+  // Eventos para guardar y eliminar
   characterForm.addEventListener("submit", handleFormSubmit)
-
-  // Eventos para el modal
-  viewCharactersBtn.addEventListener("click", () => (window.location.href = "dashboard.html"))
-  createAnotherBtn.addEventListener("click", () => {
-    saveModal.classList.remove("active")
-    resetForm()
+  deleteCharacterBtn.addEventListener("click", () => {
+    deleteModal.classList.add("active")
   })
 
-  // Evento para volver al dashboard
-  backToDashboardBtn.addEventListener("click", () => (window.location.href = "dashboard.html"))
+  // Eventos para el modal de eliminación
+  cancelDeleteBtn.addEventListener("click", () => {
+    deleteModal.classList.remove("active")
+  })
+  confirmDeleteBtn.addEventListener("click", deleteCharacter)
+
+  // Eventos para el modal de guardado
+  viewDetailsBtn.addEventListener("click", () => {
+    window.location.href = `character-details.html`
+  })
+  backToDashboardBtn.addEventListener("click", () => {
+    window.location.href = "dashboard.html"
+  })
+
+  // Evento para volver a detalles
+  backToDetailsBtn.addEventListener("click", () => {
+    window.location.href = "character-details.html"
+  })
 }
 
 function handleRaceChange() {
@@ -588,69 +610,102 @@ function updateCharacterImage() {
   characterImage.src = imagePath
 }
 
-// Funciones para guardar y cargar datos
-function saveToLocalStorage() {
-  const characterData = getFormData()
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(characterData))
+// Funciones para cargar y guardar datos del personaje
+async function loadCharacterDetails() {
+  try {
+    const response = await fetch(`${MOCKAPI_URL}/${characterId}`)
 
-  // Mostrar mensaje de confirmación
-  alert("Personaje guardado localmente. Puedes continuar más tarde.")
-}
+    if (!response.ok) {
+      throw new Error("Error al cargar los detalles del personaje")
+    }
 
-function loadFromLocalStorage() {
-  const savedData = localStorage.getItem(LOCAL_STORAGE_KEY)
-
-  if (savedData) {
-    const characterData = JSON.parse(savedData)
-    populateFormWithData(characterData)
+    const character = await response.json()
+    originalCharacter = character
+    populateFormWithData(character)
+  } catch (error) {
+    console.error("Error:", error)
+    alert("No se pudo cargar la información del personaje. Volviendo al dashboard.")
+    window.location.href = "dashboard.html"
   }
 }
 
-function populateFormWithData(data) {
+function populateFormWithData(character) {
   // Rellenar campos básicos
-  if (data.name) characterNameInput.value = data.name
-  if (data.race) characterRaceSelect.value = data.race
-  if (data.class) characterClassSelect.value = data.class
+  characterNameInput.value = character.Nombre || ""
 
+  // Esperar a que se carguen las razas y clases antes de seleccionarlas
+  const checkSelects = setInterval(() => {
+    if (characterRaceSelect.options.length > 1 && characterClassSelect.options.length > 1) {
+      clearInterval(checkSelects)
+
+      // Seleccionar raza y clase
+      characterRaceSelect.value = character.Raza || ""
+      characterClassSelect.value = character.Clase || ""
+
+      // Disparar eventos para actualizar descripciones y habilidades
+      handleRaceChange()
+      handleClassChange()
+
+      // Continuar con el resto de la población de datos
+      populateRemainingData(character)
+    }
+  }, 100)
+}
+
+function populateRemainingData(character) {
   // Género
-  if (data.gender) {
-    const genderInput = document.querySelector(`input[name="gender"][value="${data.gender}"]`)
+  if (character.Genero) {
+    const genderInput = document.querySelector(`input[name="gender"][value="${character.Genero}"]`)
     if (genderInput) genderInput.checked = true
   }
 
-  // Historia de fondo
-  if (data.background) {
-    characterBackgroundTextarea.value = data.background
-  }
-
   // Estadísticas
-  if (data.stats) {
-    if (data.stats.strength) document.getElementById("statStrength").value = data.stats.strength
-    if (data.stats.ki) document.getElementById("statKi").value = data.stats.ki
-    if (data.stats.combatMastery) document.getElementById("statCombatMastery").value = data.stats.combatMastery
-    if (data.stats.intelligence) document.getElementById("statIntelligence").value = data.stats.intelligence
-    if (data.stats.combatIntelligence)
-      document.getElementById("statCombatIntelligence").value = data.stats.combatIntelligence
-    if (data.stats.constitution) document.getElementById("statConstitution").value = data.stats.constitution
+  if (character.Estadisticas) {
+    document.getElementById("statStrength").value = character.Estadisticas.strength || 10
+    document.getElementById("statKi").value = character.Estadisticas.ki || 10
+    document.getElementById("statCombatMastery").value = character.Estadisticas.combatMastery || 10
+    document.getElementById("statIntelligence").value = character.Estadisticas.intelligence || 10
+    document.getElementById("statCombatIntelligence").value = character.Estadisticas.combatIntelligence || 10
+    document.getElementById("statConstitution").value = character.Estadisticas.constitution || 10
 
     updateStatBars()
   }
 
   // Equipamiento
-  if (data.equipment) {
-    if (data.equipment.weapon) characterWeaponSelect.value = data.equipment.weapon
-    if (data.equipment.armor) characterArmorSelect.value = data.equipment.armor
-    if (data.equipment.accessory) characterAccessorySelect.value = data.equipment.accessory
+  if (character.Equipamiento) {
+    if (character.Equipamiento.Arma) characterWeaponSelect.value = character.Equipamiento.Arma
+    if (character.Equipamiento.Armadura) characterArmorSelect.value = character.Equipamiento.Armadura
+    if (character.Equipamiento.Accesorio) characterAccessorySelect.value = character.Equipamiento.Accesorio
+  }
+
+  // Historia de fondo
+  if (character.Historia) {
+    characterBackgroundTextarea.value = character.Historia
   }
 
   // Habilidades
-  if (data.abilities) {
-    selectedAbilities = data.abilities.slice(0, MAX_ABILITIES) // Limitar a MAX_ABILITIES
-  }
+  if (character["Hechizos-Ki"] && character["Hechizos-Ki"].length > 0) {
+    // Convertir las habilidades del personaje al formato que usa la aplicación
+    selectedAbilities = character["Hechizos-Ki"].map((ability, index) => ({
+      id: index + 100, // ID temporal para evitar conflictos
+      name: ability.nombre,
+      description: ability.descripcion,
+    }))
 
-  // Disparar eventos para actualizar descripciones y habilidades
-  if (data.race) handleRaceChange()
-  if (data.class) handleClassChange()
+    // Actualizar la selección visual de habilidades
+    setTimeout(() => {
+      const abilityElements = specialAbilitiesContainer.querySelectorAll(".ability-item")
+      abilityElements.forEach((element) => {
+        const abilityId = Number.parseInt(element.dataset.id)
+        const abilityName = element.querySelector("h4").textContent
+
+        // Buscar por nombre ya que los IDs pueden no coincidir
+        if (selectedAbilities.some((a) => a.name === abilityName)) {
+          element.classList.add("selected")
+        }
+      })
+    }, 500)
+  }
 
   // Actualizar vista previa
   updatePreview()
@@ -662,7 +717,7 @@ function getFormData() {
     race: characterRaceSelect.value,
     class: characterClassSelect.value,
     gender: document.querySelector('input[name="gender"]:checked')?.value || "Masculino",
-    background: characterBackgroundTextarea ? characterBackgroundTextarea.value : "",
+    background: characterBackgroundTextarea.value,
     stats: {
       strength: Number.parseInt(document.getElementById("statStrength").value),
       ki: Number.parseInt(document.getElementById("statKi").value),
@@ -692,9 +747,9 @@ async function handleFormSubmit(event) {
   const characterData = getFormData()
 
   try {
-    // Guardar en MockAPI
-    const response = await fetch(MOCKAPI_URL, {
-      method: "POST",
+    // Actualizar en MockAPI
+    const response = await fetch(`${MOCKAPI_URL}/${characterId}`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -717,71 +772,56 @@ async function handleFormSubmit(event) {
       }),
     })
 
-    if (response.ok) {
-      // Mostrar modal de éxito
-      saveModal.classList.add("active")
-    } else {
-      console.error("Error al guardar el personaje:", response.status)
-      alert("Error al guardar el personaje. Inténtalo de nuevo.")
+    if (!response.ok) {
+      throw new Error("Error al actualizar el personaje")
     }
+
+    // Mostrar modal de confirmación
+    saveModal.classList.add("active")
   } catch (error) {
-    console.error("Error al enviar los datos:", error)
-    alert("Error al guardar el personaje. Inténtalo de nuevo.")
+    console.error("Error:", error)
+    alert("Hubo un error al actualizar el personaje. Por favor, intenta de nuevo.")
   }
 }
 
-// Funciones de validación
 function validateForm() {
-  let isValid = true
-
-  if (characterNameInput.value.trim() === "") {
-    alert("Por favor, introduce un nombre para el personaje.")
-    isValid = false
+  // Validar campos requeridos
+  if (!characterNameInput.value) {
+    alert("Por favor, ingresa un nombre para tu personaje.")
+    characterNameInput.focus()
+    return false
   }
 
-  if (characterRaceSelect.value === "") {
-    alert("Por favor, selecciona una raza para el personaje.")
-    isValid = false
+  if (!characterRaceSelect.value) {
+    alert("Por favor, selecciona una raza para tu personaje.")
+    characterRaceSelect.focus()
+    return false
   }
 
-  if (characterClassSelect.value === "") {
-    alert("Por favor, selecciona una clase para el personaje.")
-    isValid = false
+  if (!characterClassSelect.value) {
+    alert("Por favor, selecciona una clase para tu personaje.")
+    characterClassSelect.focus()
+    return false
   }
 
-  return isValid
+  return true
 }
 
-// Función para resetear el formulario
-function resetForm() {
-  characterForm.reset()
+async function deleteCharacter() {
+  try {
+    const response = await fetch(`${MOCKAPI_URL}/${characterId}`, {
+      method: "DELETE",
+    })
 
-  // Resetear descripciones
-  raceDescriptionDiv.textContent = ""
-  classDescriptionDiv.textContent = ""
+    if (!response.ok) {
+      throw new Error("Error al eliminar el personaje")
+    }
 
-  // Resetear habilidades seleccionadas
-  selectedAbilities = []
-  specialAbilitiesContainer.innerHTML =
-    '<p class="placeholder-text">Selecciona una raza y clase para ver las habilidades disponibles</p>'
-
-  // Resetear imagen
-  characterImage.src = "../assets/character-placeholder.png"
-
-  // Resetear las barras de progreso
-  const stats = [
-    { id: "statStrengthFill" },
-    { id: "statKiFill" },
-    { id: "statCombatMasteryFill" },
-    { id: "statIntelligenceFill" },
-    { id: "statCombatIntelligenceFill" },
-    { id: "statConstitutionFill" },
-  ]
-
-  stats.forEach((stat) => {
-    document.getElementById(stat.id).style.width = "0%"
-  })
-
-  // Actualizar la vista previa
-  updatePreview()
+    alert("Personaje eliminado correctamente")
+    window.location.href = "dashboard.html"
+  } catch (error) {
+    console.error("Error:", error)
+    alert("Error al eliminar el personaje. Inténtalo de nuevo.")
+    deleteModal.classList.remove("active")
+  }
 }

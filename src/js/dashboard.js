@@ -82,7 +82,7 @@ function createCharacterDiv(character) {
   card.className = "character-card"
 
   card.innerHTML = `
-    <h3>${character.Nombre || "Sin nombre"}</h3>
+    <h3 class="character-name">${character.Nombre || "Sin nombre"}</h3>
     <p>Raza: ${character.Raza || "-"}</p>
     <p>Clase: ${character.Clase || "-"}</p>
     <button class="btn btn-primary view-character" data-id="${character.id}">Ver detalles</button>
@@ -91,12 +91,9 @@ function createCharacterDiv(character) {
   // Añadir evento para ver detalles
   const viewButton = card.querySelector(".view-character")
   viewButton.addEventListener("click", () => {
-    // Aquí puedes implementar la vista de detalles
-    // Por ahora solo guardamos el ID en localStorage y redirigimos
+    // Guardar el ID en localStorage y redirigir a la página de detalles
     localStorage.setItem("viewCharacterId", character.id)
-    // En el futuro, puedes crear una página de detalles
-    // window.location.href = "character-details.html";
-    alert(`Ver detalles del personaje ${character.Nombre}`)
+    window.location.href = "character-details.html"
   })
 
   return card

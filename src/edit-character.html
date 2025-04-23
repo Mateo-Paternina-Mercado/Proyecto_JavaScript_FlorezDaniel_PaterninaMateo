@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-<title>Dragon Ball Super D&D - Creación de Personaje</title>
+<title>Dragon Ball Super D&D - Editar Personaje</title>
 </head>
 <body>
 <div class="character-creator-container">
@@ -17,14 +17,14 @@
         <div class="logo-container">
             <img src="../assets/Dragon_ball_logo.png" alt="Dragon Ball Super Logo" class="logo">
         </div>
-        <h1>Creación de Personaje</h1>
+        <h1>Editar Personaje</h1>
         <div>
-            <button id="backToDashboard" class="btn secondary-btn">Volver al Dashboard</button>
+            <button id="backToDetails" class="btn secondary-btn">Volver a Detalles</button>
         </div>
     </header>
 
     <div class="creator-content">
-        <!-- Formulario de creación de personaje -->
+        <!-- Formulario de edición de personaje -->
         <div class="character-form-container">
             <form id="characterForm">
                 <div class="form-section">
@@ -175,8 +175,8 @@
                 </div>
                 
                 <div class="form-actions">
-                    <button type="button" id="saveLocalBtn" class="btn secondary-btn">Guardar Localmente</button>
-                    <button type="submit" id="saveCharacterBtn" class="btn primary-btn">Guardar Personaje</button>
+                    <button type="button" id="deleteCharacterBtn" class="btn danger-btn">Eliminar Personaje</button>
+                    <button type="submit" id="saveCharacterBtn" class="btn primary-btn">Guardar Cambios</button>
                 </div>
             </form>
         </div>
@@ -232,18 +232,30 @@
     </div>
 </div>
 
-<!-- Modal de confirmación -->
-<div class="modal" id="saveModal">
+<!-- Modal de confirmación para eliminar -->
+<div class="modal" id="deleteModal">
     <div class="modal-content">
-        <h2>¡Personaje Guardado!</h2>
-        <p>Tu personaje ha sido guardado correctamente.</p>
+        <h2>¿Eliminar Personaje?</h2>
+        <p>¿Estás seguro de que deseas eliminar este personaje? Esta acción no se puede deshacer.</p>
         <div class="modal-actions">
-            <button id="viewCharactersBtn" class="btn secondary-btn">Ver Mis Personajes</button>
-            <button id="createAnotherBtn" class="btn primary-btn">Crear Otro Personaje</button>
+            <button id="cancelDeleteBtn" class="btn secondary-btn">Cancelar</button>
+            <button id="confirmDeleteBtn" class="btn danger-btn">Eliminar</button>
         </div>
     </div>
 </div>
 
-<script src="./js/character-creator.js"></script>
+<!-- Modal de confirmación de guardado -->
+<div class="modal" id="saveModal">
+    <div class="modal-content">
+        <h2>¡Personaje Actualizado!</h2>
+        <p>Los cambios han sido guardados correctamente.</p>
+        <div class="modal-actions">
+            <button id="viewDetailsBtn" class="btn secondary-btn">Ver Detalles</button>
+            <button id="backToDashboardBtn" class="btn primary-btn">Volver al Dashboard</button>
+        </div>
+    </div>
+</div>
+
+<script src="./js/edit-character.js"></script>
 </body>
 </html>
