@@ -1,3 +1,7 @@
+// Importar el servicio de API
+// Modified to use global functions instead of imports
+// import { getRaces } from "./api-service.js"
+
 // Constantes y configuración
 const MOCKAPI_URL = "https://67fe6eb758f18d7209ee325e.mockapi.io/characters"
 const characterId = localStorage.getItem("viewCharacterId")
@@ -24,48 +28,38 @@ const deleteCharacterBtn = document.getElementById("deleteCharacterBtn")
 const deleteModal = document.getElementById("deleteModal")
 const cancelDeleteBtn = document.getElementById("cancelDeleteBtn")
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn")
+const loadingIndicator = document.getElementById("loadingIndicator")
 
-// Datos de razas para obtener imágenes
-const races = [
-  {
-    name: "Saiyan",
-    imageUrl: "../assets/races/saiyan.png",
-  },
-  {
-    name: "Namekiano",
-    imageUrl: "../assets/races/namekian.png",
-  },
-  {
-    name: "Humano",
-    imageUrl: "../assets/races/human.png",
-  },
-  {
-    name: "Androide",
-    imageUrl: "../assets/races/android.png",
-  },
-  {
-    name: "Majin",
-    imageUrl: "../assets/races/majin.png",
-  },
-  {
-    name: "Raza de Freezer",
-    imageUrl: "../assets/races/frieza.png",
-  },
-]
+// Variables globales
+let races = []
 
 // Inicialización
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Verificar si hay un ID de personaje para ver
   if (!characterId) {
     window.location.href = "dashboard.html"
     return
   }
 
-  // Cargar los datos del personaje
-  loadCharacterDetails()
+  // Mostrar indicador de carga
+  showLoading(true)
 
-  // Configurar eventos
-  setupEventListeners()
+  try {
+    // Cargar razas para obtener imágenes
+    races = await window.getRaces()
+
+    // Cargar los datos del personaje
+    await loadCharacterDetails()
+
+    // Configurar eventos
+    setupEventListeners()
+  } catch (error) {
+    console.error("Error during initialization:", error)
+    alert("Hubo un error al cargar los datos. Por favor, recarga la página.")
+  } finally {
+    // Ocultar indicador de carga
+    showLoading(false)
+  }
 })
 
 // Funciones
@@ -190,6 +184,9 @@ function setupEventListeners() {
 
 async function deleteCharacter() {
   try {
+    // Mostrar indicador de carga
+    showLoading(true)
+
     const response = await fetch(`${MOCKAPI_URL}/${characterId}`, {
       method: "DELETE",
     })
@@ -204,5 +201,15 @@ async function deleteCharacter() {
     console.error("Error:", error)
     alert("Error al eliminar el personaje. Inténtalo de nuevo.")
     deleteModal.classList.remove("active")
+  } finally {
+    // Ocultar indicador de carga
+    showLoading(false)
+  }
+}
+
+// Función para mostrar/ocultar indicador de carga
+function showLoading(show) {
+  if (loadingIndicator) {
+    loadingIndicator.style.display = show ? "flex" : "none"
   }
 }

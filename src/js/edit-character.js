@@ -1,3 +1,7 @@
+// Importar el servicio de API
+// Modified to use global functions instead of imports
+// import { getRaces, getClasses, getEquipment, getSpecialAbilities } from "./api-service.js"
+
 // Constantes y configuración
 const MOCKAPI_URL = "https://67fe6eb758f18d7209ee325e.mockapi.io/characters"
 const LOCAL_STORAGE_KEY = "dbs_character_edit_draft"
@@ -30,6 +34,7 @@ const confirmDeleteBtn = document.getElementById("confirmDeleteBtn")
 const saveModal = document.getElementById("saveModal")
 const viewDetailsBtn = document.getElementById("viewDetailsBtn")
 const backToDashboardBtn = document.getElementById("backToDashboardBtn")
+const loadingIndicator = document.getElementById("loadingIndicator")
 
 // Elementos de la vista previa
 const previewName = document.getElementById("previewName")
@@ -59,213 +64,43 @@ let selectedAbilities = []
 let originalCharacter = null
 
 // Inicialización
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Verificar si hay un ID de personaje para editar
   if (!characterId) {
     window.location.href = "dashboard.html"
     return
   }
 
-  // Cargar datos desde APIs
-  fetchRaces()
-  fetchClasses()
-  fetchEquipment()
+  // Mostrar indicador de carga
+  showLoading(true)
 
-  // Cargar los datos del personaje
-  loadCharacterDetails()
-
-  // Configurar eventos
-  setupEventListeners()
-})
-
-// Funciones para cargar datos
-async function fetchRaces() {
   try {
-    // En un caso real, esto vendría de una API externa
-    // Por ahora, usamos datos simulados de Dragon Ball Super
-    const racesData = [
-      {
-        id: 1,
-        name: "Saiyan",
-        description: "Guerreros poderosos con la capacidad de transformarse. Obtienen bonificación en Fuerza y Ki.",
-        imageUrl: "../assets/races/saiyan.png",
-      },
-      {
-        id: 2,
-        name: "Namekiano",
-        description:
-          "Seres sabios con capacidad de regeneración. Obtienen bonificación en Inteligencia y Constitución.",
-        imageUrl: "../assets/races/namekian.png",
-      },
-      {
-        id: 3,
-        name: "Humano",
-        description: "Adaptables y versátiles. Obtienen bonificación en todas las estadísticas.",
-        imageUrl: "../assets/races/human.png",
-      },
-      {
-        id: 4,
-        name: "Androide",
-        description:
-          "Creaciones tecnológicas con energía ilimitada. Obtienen bonificación en Ki y Maestría en Combate.",
-        imageUrl: "../assets/races/android.png",
-      },
-      {
-        id: 5,
-        name: "Majin",
-        description: "Criaturas mágicas con cuerpos maleables. Obtienen bonificación en Constitución y Ki.",
-        imageUrl: "../assets/races/majin.png",
-      },
-      {
-        id: 6,
-        name: "Raza de Freezer",
-        description:
-          "Seres con gran poder natural y múltiples transformaciones. Obtienen bonificación en Ki e Inteligencia en Combate.",
-        imageUrl: "../assets/races/frieza.png",
-      },
-    ]
+    // Cargar datos desde APIs
+    races = await window.getRaces()
+    classes = await window.getClasses()
+    const equipment = await window.getEquipment()
+    weapons = equipment.weapons
+    armors = equipment.armors
+    accessories = equipment.accessories
 
-    races = racesData
+    // Poblar selectores
     populateRaceSelect()
-  } catch (error) {
-    console.error("Error al cargar las razas:", error)
-  }
-}
-
-async function fetchClasses() {
-  try {
-    // Datos simulados de clases
-    const classesData = [
-      {
-        id: 1,
-        name: "Guerrero Z",
-        description:
-          "Luchadores dedicados al combate físico. Especialistas en técnicas de ki básicas y combate cuerpo a cuerpo.",
-        imageUrl: "../assets/classes/warrior.png",
-      },
-      {
-        id: 2,
-        name: "Maestro de Ki",
-        description:
-          "Especialistas en manipulación de energía. Dominan técnicas de ki avanzadas y ataques a distancia.",
-        imageUrl: "../assets/classes/ki-master.png",
-      },
-      {
-        id: 3,
-        name: "Estratega",
-        description: "Combatientes inteligentes que analizan al oponente. Obtienen ventajas tácticas en combate.",
-        imageUrl: "../assets/classes/strategist.png",
-      },
-      {
-        id: 4,
-        name: "Defensor",
-        description: "Especialistas en resistencia y protección. Pueden soportar grandes cantidades de daño.",
-        imageUrl: "../assets/classes/defender.png",
-      },
-      {
-        id: 5,
-        name: "Transformista",
-        description: "Maestros de las transformaciones. Pueden cambiar de forma para aumentar su poder.",
-        imageUrl: "../assets/classes/transformer.png",
-      },
-    ]
-
-    classes = classesData
     populateClassSelect()
-  } catch (error) {
-    console.error("Error al cargar las clases:", error)
-  }
-}
-
-async function fetchEquipment() {
-  try {
-    // Datos simulados de equipamiento
-    weapons = [
-      { id: 1, name: "Puños Desnudos", description: "El arma natural de todo guerrero." },
-      { id: 2, name: "Bastón Extensible", description: "Un bastón mágico que puede extenderse a voluntad." },
-      { id: 3, name: "Espada Z", description: "Una espada capaz de canalizar el ki del usuario." },
-      { id: 4, name: "Bastón Sagrado", description: "Un bastón antiguo con propiedades místicas." },
-      { id: 5, name: "Guantes de Ki", description: "Guantes que amplifican el poder de los ataques de ki." },
-    ]
-
-    armors = [
-      { id: 1, name: "Gi de Entrenamiento", description: "Uniforme ligero ideal para el movimiento." },
-      { id: 2, name: "Armadura Saiyan", description: "Armadura flexible y resistente de tecnología alienígena." },
-      { id: 3, name: "Ropa Pesada", description: "Ropa con peso para entrenamiento que aumenta la resistencia." },
-      { id: 4, name: "Traje de Combate", description: "Traje diseñado para maximizar la movilidad en combate." },
-      { id: 5, name: "Armadura de la Patrulla Galáctica", description: "Armadura oficial con protección avanzada." },
-    ]
-
-    accessories = [
-      { id: 1, name: "Semilla del Ermitaño", description: "Restaura completamente la salud y energía." },
-      { id: 2, name: "Radar del Dragón", description: "Dispositivo para localizar las esferas del dragón." },
-      { id: 3, name: "Anillo de Ki", description: "Aumenta la regeneración de ki durante el combate." },
-      { id: 4, name: "Pendientes Potara", description: "Permite la fusión con otro guerrero." },
-      { id: 5, name: "Báculo Sagrado", description: "Antiguo báculo con propiedades místicas." },
-    ]
-
     populateEquipmentSelects()
+
+    // Cargar los datos del personaje
+    await loadCharacterDetails()
+
+    // Configurar eventos
+    setupEventListeners()
   } catch (error) {
-    console.error("Error al cargar el equipamiento:", error)
+    console.error("Error during initialization:", error)
+    alert("Hubo un error al cargar los datos. Por favor, recarga la página.")
+  } finally {
+    // Ocultar indicador de carga
+    showLoading(false)
   }
-}
-
-function fetchSpecialAbilities(race, characterClass) {
-  // Simulamos la obtención de habilidades basadas en la raza y clase seleccionadas
-  if (!race || !characterClass) return []
-
-  const raceAbilities = {
-    Saiyan: [
-      { id: 1, name: "Zenkai", description: "Aumenta el poder después de recuperarse de heridas graves." },
-      { id: 2, name: "Super Saiyan", description: "Transformación que aumenta drásticamente el poder." },
-    ],
-    Namekiano: [
-      { id: 3, name: "Regeneración", description: "Capacidad de regenerar partes del cuerpo dañadas." },
-      { id: 4, name: "Fusión Namekiana", description: "Capacidad de fusionarse con otro Namekiano." },
-    ],
-    Humano: [
-      { id: 5, name: "Potencial Oculto", description: "Desbloquea el poder latente en situaciones críticas." },
-      { id: 6, name: "Adaptabilidad", description: "Aprende técnicas nuevas con mayor facilidad." },
-    ],
-    Androide: [
-      { id: 7, name: "Energía Ilimitada", description: "No se agota el ki en combates prolongados." },
-      { id: 8, name: "Mejoras Tecnológicas", description: "Puede integrar mejoras a su cuerpo." },
-    ],
-    Majin: [
-      { id: 9, name: "Cuerpo Elástico", description: "Puede estirar y deformar su cuerpo a voluntad." },
-      { id: 10, name: "Absorción", description: "Puede absorber a otros seres para ganar sus habilidades." },
-    ],
-    "Raza de Freezer": [
-      { id: 11, name: "Transformaciones", description: "Múltiples formas que liberan poder oculto." },
-      { id: 12, name: "Supervivencia Espacial", description: "Puede sobrevivir en el vacío del espacio." },
-    ],
-  }
-
-  const classAbilities = {
-    "Guerrero Z": [
-      { id: 13, name: "Kamehameha", description: "Poderoso rayo de energía concentrada." },
-      { id: 14, name: "Kaioken", description: "Técnica que multiplica el poder a costa de tensión física." },
-    ],
-    "Maestro de Ki": [
-      { id: 15, name: "Kikoho", description: "Potente ataque de ki que forma un triángulo de energía." },
-      { id: 16, name: "Taiyoken", description: "Destello de luz que ciega temporalmente al oponente." },
-    ],
-    Estratega: [
-      { id: 17, name: "Análisis de Combate", description: "Identifica puntos débiles del oponente." },
-      { id: 18, name: "Contraataque", description: "Devuelve parte del daño recibido." },
-    ],
-    Defensor: [
-      { id: 19, name: "Barrera de Ki", description: "Crea un escudo de energía protector." },
-      { id: 20, name: "Resistencia Aumentada", description: "Reduce el daño recibido de ataques físicos." },
-    ],
-    Transformista: [
-      { id: 21, name: "Transformación Avanzada", description: "Desbloquea una forma más poderosa." },
-      { id: 22, name: "Control de Forma", description: "Mantiene transformaciones por más tiempo." },
-    ],
-  }
-
-  return [...(raceAbilities[race] || []), ...(classAbilities[characterClass] || [])]
-}
+})
 
 // Funciones para poblar selectores
 function populateRaceSelect() {
@@ -319,7 +154,7 @@ function populateEquipmentSelects() {
   })
 }
 
-function populateSpecialAbilities() {
+async function populateSpecialAbilities() {
   const race = characterRaceSelect.value
   const characterClass = characterClassSelect.value
 
@@ -329,39 +164,49 @@ function populateSpecialAbilities() {
     return
   }
 
-  specialAbilities = fetchSpecialAbilities(race, characterClass)
+  // Mostrar indicador de carga en el contenedor de habilidades
+  specialAbilitiesContainer.innerHTML = '<p class="placeholder-text">Cargando habilidades...</p>'
 
-  if (specialAbilities.length === 0) {
-    specialAbilitiesContainer.innerHTML =
-      '<p class="placeholder-text">No hay habilidades disponibles para esta combinación</p>'
-    return
-  }
+  try {
+    const abilities = await window.getSpecialAbilities(race, characterClass)
+    specialAbilities = abilities
 
-  // Añadir mensaje sobre el límite de habilidades
-  specialAbilitiesContainer.innerHTML = `
-    <div class="abilities-limit-message">
-      <p>Puedes seleccionar hasta ${MAX_ABILITIES} habilidades especiales</p>
-    </div>
-  `
-
-  specialAbilities.forEach((ability) => {
-    const abilityElement = document.createElement("div")
-    abilityElement.className = "ability-item"
-    abilityElement.dataset.id = ability.id
-
-    if (selectedAbilities.some((a) => a.id === ability.id)) {
-      abilityElement.classList.add("selected")
+    if (specialAbilities.length === 0) {
+      specialAbilitiesContainer.innerHTML =
+        '<p class="placeholder-text">No hay habilidades disponibles para esta combinación</p>'
+      return
     }
 
-    abilityElement.innerHTML = `
-          <h4>${ability.name}</h4>
-          <p>${ability.description}</p>
-      `
+    // Añadir mensaje sobre el límite de habilidades
+    specialAbilitiesContainer.innerHTML = `
+      <div class="abilities-limit-message">
+        <p>Puedes seleccionar hasta ${MAX_ABILITIES} habilidades especiales</p>
+      </div>
+    `
 
-    abilityElement.addEventListener("click", () => toggleAbility(ability, abilityElement))
+    specialAbilities.forEach((ability) => {
+      const abilityElement = document.createElement("div")
+      abilityElement.className = "ability-item"
+      abilityElement.dataset.id = ability.id
 
-    specialAbilitiesContainer.appendChild(abilityElement)
-  })
+      if (selectedAbilities.some((a) => a.id === ability.id)) {
+        abilityElement.classList.add("selected")
+      }
+
+      abilityElement.innerHTML = `
+            <h4>${ability.name}</h4>
+            <p>${ability.description}</p>
+        `
+
+      abilityElement.addEventListener("click", () => toggleAbility(ability, abilityElement))
+
+      specialAbilitiesContainer.appendChild(abilityElement)
+    })
+  } catch (error) {
+    console.error("Error al cargar las habilidades:", error)
+    specialAbilitiesContainer.innerHTML =
+      '<p class="placeholder-text">Error al cargar las habilidades. Inténtalo de nuevo.</p>'
+  }
 }
 
 // Funciones para manejar eventos
@@ -405,7 +250,7 @@ function setupEventListeners() {
   })
 }
 
-function handleRaceChange() {
+async function handleRaceChange() {
   const selectedRace = characterRaceSelect.value
   const raceData = races.find((race) => race.name === selectedRace)
 
@@ -421,11 +266,11 @@ function handleRaceChange() {
   // Resetear habilidades seleccionadas al cambiar de raza
   selectedAbilities = []
 
-  populateSpecialAbilities()
+  await populateSpecialAbilities()
   updatePreview()
 }
 
-function handleClassChange() {
+async function handleClassChange() {
   const selectedClass = characterClassSelect.value
   const classData = classes.find((cls) => cls.name === selectedClass)
 
@@ -438,7 +283,7 @@ function handleClassChange() {
   // Resetear habilidades seleccionadas al cambiar de clase
   selectedAbilities = []
 
-  populateSpecialAbilities()
+  await populateSpecialAbilities()
   updatePreview()
 }
 
@@ -743,6 +588,9 @@ async function handleFormSubmit(event) {
     return
   }
 
+  // Mostrar indicador de carga
+  showLoading(true)
+
   // Obtener datos del formulario
   const characterData = getFormData()
 
@@ -781,6 +629,9 @@ async function handleFormSubmit(event) {
   } catch (error) {
     console.error("Error:", error)
     alert("Hubo un error al actualizar el personaje. Por favor, intenta de nuevo.")
+  } finally {
+    // Ocultar indicador de carga
+    showLoading(false)
   }
 }
 
@@ -809,6 +660,9 @@ function validateForm() {
 
 async function deleteCharacter() {
   try {
+    // Mostrar indicador de carga
+    showLoading(true)
+
     const response = await fetch(`${MOCKAPI_URL}/${characterId}`, {
       method: "DELETE",
     })
@@ -823,5 +677,15 @@ async function deleteCharacter() {
     console.error("Error:", error)
     alert("Error al eliminar el personaje. Inténtalo de nuevo.")
     deleteModal.classList.remove("active")
+  } finally {
+    // Ocultar indicador de carga
+    showLoading(false)
+  }
+}
+
+// Función para mostrar/ocultar indicador de carga
+function showLoading(show) {
+  if (loadingIndicator) {
+    loadingIndicator.style.display = show ? "flex" : "none"
   }
 }

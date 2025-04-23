@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="../styles/style.css">
 <link rel="stylesheet" href="../styles/character-creator.css">
+<link rel="stylesheet" href="../styles/loading.css">
 <link rel="icon" href="../assets/Dragon_ball_logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +13,10 @@
 <title>Dragon Ball Super D&D - Creación de Personaje</title>
 </head>
 <body>
+<div id="loadingIndicator" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>Cargando datos...</p>
+</div>
 <div class="character-creator-container">
     <header class="creator-header">
         <div class="logo-container">
@@ -244,6 +249,7 @@
     </div>
 </div>
 
+<script src="./js/api-service.js"></script>
 <script src="./js/character-creator.js"></script>
 </body>
 </html>

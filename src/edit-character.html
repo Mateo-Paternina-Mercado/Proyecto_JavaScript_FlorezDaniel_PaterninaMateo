@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="../styles/style.css">
 <link rel="stylesheet" href="../styles/character-creator.css">
+<link rel="stylesheet" href="../styles/loading.css">
 <link rel="icon" href="../assets/Dragon_ball_logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +13,10 @@
 <title>Dragon Ball Super D&D - Editar Personaje</title>
 </head>
 <body>
+<div id="loadingIndicator" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>Cargando datos...</p>
+</div>
 <div class="character-creator-container">
     <header class="creator-header">
         <div class="logo-container">
@@ -39,7 +44,6 @@
                         <select id="characterRace" name="characterRace" required>
                             <option value="" disabled selected>Selecciona una raza</option>
                             <!-- Se llenará dinámicamente desde la API -->
-                            <option value="loading">Cargando razas...</option>
                         </select>
                         <div id="raceDescription" class="description-box"></div>
                     </div>
@@ -49,7 +53,6 @@
                         <select id="characterClass" name="characterClass" required>
                             <option value="" disabled selected>Selecciona una clase</option>
                             <!-- Se llenará dinámicamente desde la API -->
-                            <option value="loading">Cargando clases...</option>
                         </select>
                         <div id="classDescription" class="description-box"></div>
                     </div>
@@ -244,11 +247,11 @@
     </div>
 </div>
 
-<!-- Modal de confirmación de guardado -->
+<!-- Modal de confirmación para guardar -->
 <div class="modal" id="saveModal">
     <div class="modal-content">
         <h2>¡Personaje Actualizado!</h2>
-        <p>Los cambios han sido guardados correctamente.</p>
+        <p>Los cambios en tu personaje han sido guardados correctamente.</p>
         <div class="modal-actions">
             <button id="viewDetailsBtn" class="btn secondary-btn">Ver Detalles</button>
             <button id="backToDashboardBtn" class="btn primary-btn">Volver al Dashboard</button>
@@ -256,6 +259,7 @@
     </div>
 </div>
 
+<script src="./js/api-service.js"></script>
 <script src="./js/edit-character.js"></script>
 </body>
 </html>
