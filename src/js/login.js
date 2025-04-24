@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }));
                 
                 // Redirigir a la página principal o dashboard
-                window.location.href = './views/dashboard.html';
+                window.location.href = './dashboard.html';
             } else {
                 showError('Email o contraseña incorrectos');
             }
