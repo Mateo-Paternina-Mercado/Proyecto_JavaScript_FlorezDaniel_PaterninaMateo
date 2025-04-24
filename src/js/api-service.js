@@ -154,6 +154,21 @@ async function getRaces() {
           dragonBallRace.description = "Powerful alien race capable of surviving in space and transforming."
           dragonBallRace.imageUrl = "../assets/races/frieza.png"
           break
+        case "Halfling":
+          dragonBallRace.name = "Halfling"
+          dragonBallRace.description = "Small but brave folk known for their luck and stealth."
+          dragonBallRace.imageUrl = "../assets/races/halfling.png"
+          break
+        case "Half-Elf":
+          dragonBallRace.name = "Half-Elf"
+          dragonBallRace.description = "Beings with both human and elven heritage, combining the best of both worlds."
+          dragonBallRace.imageUrl = "../assets/races/half-elf.png"
+          break
+        case "Dwarf":
+          dragonBallRace.name = "Dwarf"
+          dragonBallRace.description = "Stout and sturdy folk with natural mining and crafting abilities."
+          dragonBallRace.imageUrl = "../assets/races/dwarf.png"
+          break
       }
 
       return dragonBallRace
@@ -200,6 +215,24 @@ async function getRaces() {
         name: "Raza de Freezer",
         description: "Powerful alien race capable of surviving in space and transforming.",
         imageUrl: "../assets/races/frieza.png",
+      },
+      {
+        id: 7,
+        name: "Halfling",
+        description: "Small but brave folk known for their luck and stealth.",
+        imageUrl: "../assets/races/halfling.png",
+      },
+      {
+        id: 8,
+        name: "Half-Elf",
+        description: "Beings with both human and elven heritage, combining the best of both worlds.",
+        imageUrl: "../assets/races/half-elf.png",
+      },
+      {
+        id: 9,
+        name: "Dwarf",
+        description: "Stout and sturdy folk with natural mining and crafting abilities.",
+        imageUrl: "../assets/races/dwarf.png",
       },
     ]
   }

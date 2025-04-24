@@ -24,6 +24,23 @@
 
         <div class="dashboard-card">
             <h2>Personajes Creados</h2>
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <input type="text" id="characterSearch" placeholder="Buscar personajes..." class="search-input">
+                    <button id="clearSearch" class="clear-search-btn">&times;</button>
+                </div>
+                <div class="search-filters">
+                    <label class="filter-label">
+                        <input type="checkbox" id="filterName" checked> Nombre
+                    </label>
+                    <label class="filter-label">
+                        <input type="checkbox" id="filterRace" checked> Raza
+                    </label>
+                    <label class="filter-label">
+                        <input type="checkbox" id="filterClass" checked> Clase
+                    </label>
+                </div>
+            </div>
             <div class="characters-grid">
                 <div class="create-character" id="createCharacter">
                     <span>+</span>
